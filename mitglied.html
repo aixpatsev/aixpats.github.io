@@ -127,19 +127,19 @@
     <div class="form-section">
       <div class="form-section-title"><span>👤</span> <span id="sec-personal">Personal Information</span></div>
       <div class="row">
-        <div class="field"><label id="lbl-fname">First Name <span class="req">*</span></label><input type="text" name="first_name" required placeholder="Ahmad"/></div>
+        <div class="field"><label id="lbl-fname">First Name <span class="req">*</span></label><input type="text" name="first_name" required placeholder="Imran"/></div>
         <div class="field"><label id="lbl-lname">Last Name <span class="req">*</span></label><input type="text" name="last_name" required placeholder="Khan"/></div>
       </div>
       <div class="row">
-        <div class="field"><label id="lbl-email">Email <span class="req">*</span></label><input type="email" name="email" id="main-email" required placeholder="ahmad@example.com" oninput="document.getElementById('hidden-email').value=this.value"/></div>
-        <div class="field"><label id="lbl-phone">Phone</label><input type="tel" name="phone" placeholder="+49 170 0000000"/></div>
+        <div class="field"><label id="lbl-email">Email <span class="req">*</span></label><input type="email" name="email" id="main-email" required placeholder="Imran.Khan@pakistan.com" oninput="document.getElementById('hidden-email').value=this.value"/></div>
+        <div class="field"><label id="lbl-phone">Phone</label><input type="tel" name="phone" placeholder="+49 170 1234567"/></div>
       </div>
       <div class="row">
         <div class="field"><label id="lbl-dob">Date of Birth <span class="req">*</span></label><input type="date" name="dob" required/></div>
-        <div class="field"><label id="lbl-nationality">Nationality</label><input type="text" name="nationality" placeholder="Pakistani, Indian, Bangladeshi..."/></div>
+        <div class="field"><label id="lbl-nationality">Nationality</label><input type="text" name="nationality" placeholder="Pakistani"/></div>
       </div>
       <div class="row full">
-        <div class="field"><label id="lbl-address">Address in Aachen <span class="req">*</span></label><input type="text" name="address" required placeholder="Musterstrasse 12, 52062 Aachen"/></div>
+        <div class="field"><label id="lbl-address">Current Address <span class="req">*</span></label><input type="text" name="address" required placeholder="Musterstraße 12, 52062 Aachen"/></div>
       </div>
       <div id="employment-block">
         <div class="row full" style="margin-top:4px;">
@@ -185,11 +185,11 @@
         <p style="font-size:0.88rem;color:#444;line-height:1.6;" id="sepa-mandate-text">By filling in your bank details and submitting this form, you authorise Aixpats e.V. to collect the annual membership fee via SEPA Direct Debit. You have the right to a refund from your bank within 8 weeks.</p>
       </div>
       <div class="row">
-        <div class="field"><label id="lbl-account-holder">Account Holder Name <span class="req">*</span></label><input type="text" name="sepa_account_holder" id="sepa-holder" required placeholder="Full name as on bank account"/></div>
+        <div class="field"><label id="lbl-account-holder">Account Holder Name <span class="req">*</span></label><input type="text" name="sepa_account_holder" id="sepa-holder" required placeholder="Imran Khan"/></div>
         <div class="field"><label id="lbl-bank">Bank Name</label><input type="text" name="sepa_bank_name" placeholder="Sparkasse Aachen"/></div>
       </div>
       <div class="row">
-        <div class="field"><label id="lbl-iban">IBAN <span class="req">*</span></label><input type="text" name="sepa_iban" id="iban-input" required placeholder="DE12 3456 7890 1234 5678 90" oninput="formatIBAN(this)"/></div>
+        <div class="field"><label id="lbl-iban">IBAN <span class="req">*</span></label><input type="text" name="sepa_iban" id="iban-input" required placeholder="DE89 3704 0044 0532 0130 00" oninput="formatIBAN(this)"/></div>
         <div class="field"><label id="lbl-bic">BIC / SWIFT</label><input type="text" name="sepa_bic" placeholder="SSKMDEMMXXX"/></div>
       </div>
       <div class="sepa-info" id="sepa-info-text">🔒 Your bank details are transmitted securely and used exclusively for annual fee collection. This mandate remains valid until cancelled in writing.</div>
@@ -201,7 +201,7 @@
       <div class="consent-row"><input type="checkbox" id="c2" required/><label for="c2" id="lbl-c2">I consent to the processing of my personal data for membership administration by Aixpats e.V. (GDPR). <span class="req">*</span></label></div>
       <div class="consent-row" id="sepa-consent-row"><input type="checkbox" id="c3" required/><label for="c3" id="lbl-c3">I authorise Aixpats e.V. to collect the annual membership fee from my bank account via SEPA Direct Debit (Lastschrift). <span class="req">*</span></label></div>
       <div class="row full" style="margin-top:8px;">
-        <div class="field"><label id="lbl-place-date">Place &amp; Date <span class="req">*</span></label><input type="text" name="place_date" required placeholder="Aachen, 01.03.2025"/></div>
+        <div class="field"><label id="lbl-place-date">Place &amp; Date <span class="req">*</span></label><input type="text" name="place_date" id="place-date-input" required placeholder="Aachen, 01.03.2025"/></div>
       </div>
       <div style="margin-top:20px;"><button type="submit" class="submit-btn" id="submit-btn">Submit Application →</button></div>
     </div>
@@ -446,6 +446,18 @@ else setLang("en");
     if(a.onclick && a.onclick.toString().indexOf('mailto')>-1) return;
   });
 })();
+
+  // Set today's date as placeholder for place_date
+  (function(){
+    var el = document.getElementById('place-date-input');
+    if(el){
+      var now = new Date();
+      var day = String(now.getDate()).padStart(2,'0');
+      var mon = String(now.getMonth()+1).padStart(2,'0');
+      var yr = now.getFullYear();
+      el.placeholder = 'Aachen, ' + day + '.' + mon + '.' + yr;
+    }
+  })();
 </script>
 </body>
 </html>
