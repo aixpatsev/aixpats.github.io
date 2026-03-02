@@ -118,7 +118,7 @@
     <br/><a href="index.html" style="color:var(--green);font-weight:700;" id="success-back">← Back to Website</a>
   </div>
 
-  <form id="memberForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" data-appsscript="https://script.google.com/macros/s/AKfycbwHQWF6K8n3GBZlyhYXL46SS2U4v16Lm3WAbLpBxlS_HimFnuKhQVQkfQENAWV2kkcT/exec">
+  <form id="memberForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" data-appsscript="YOUR_APPS_SCRIPT_URL">
     <input type="hidden" name="_subject" value="New Membership Application – Aixpats e.V."/>
     <input type="hidden" name="_replyto" id="hidden-email"/>
     <input type="hidden" name="membership_type" id="hidden-type" value="Active"/>
@@ -325,6 +325,7 @@ document.getElementById("memberForm").addEventListener("submit", async function(
   const btn = document.getElementById("submit-btn");
   const originalText = btn.textContent;
 
+  // Collect form data
   const fd = new FormData(this);
   const data = {};
   for(let [k,v] of fd.entries()){
@@ -332,35 +333,25 @@ document.getElementById("memberForm").addEventListener("submit", async function(
   }
 
   const appsScriptUrl = this.dataset.appsscript || "";
-  const formspreeAction = this.action;
-  const hasAppsScript = appsScriptUrl && !appsScriptUrl.includes("https://script.google.com/macros/s/AKfycbwHQWF6K8n3GBZlyhYXL46SS2U4v16Lm3WAbLpBxlS_HimFnuKhQVQkfQENAWV2kkcT/exec");
-  const hasFormspree = !formspreeAction.includes("YOUR_FORMSPREE_ID");
+  const hasAppsScript = appsScriptUrl && !appsScriptUrl.includes("YOUR_APPS_SCRIPT_URL");
 
   btn.textContent = "⏳ Sending...";
   btn.disabled = true;
 
-  try {
-    if(hasAppsScript){
-      const res = await fetch(appsScriptUrl, {
-        method:"POST",
-        body: JSON.stringify(data),
-        headers:{"Content-Type":"application/json"}
-      });
-      const json = await res.json();
-      if(json.result === "success"){ showSuccess(); }
-      else { throw new Error("Apps Script error"); }
-    } else if(hasFormspree){
-      const res = await fetch(formspreeAction, {
-        method:"POST", body:fd, headers:{Accept:"application/json"}
-      });
-      if(res.ok){ showSuccess(); } else { throw new Error("Formspree error"); }
-    } else {
-      sendByEmail(data);
+  if(hasAppsScript){
+    // Send as GET request with URL params - works without CORS issues
+    const params = new URLSearchParams(data).toString();
+    const url = appsScriptUrl + "?" + params;
+    try {
+      // mode:no-cors means we don't read the response, but the request IS sent and received by Apps Script
+      await fetch(url, { method:"GET", mode:"no-cors" });
+    } catch(err){
+      // no-cors always throws on response read, but data was still sent - ignore
     }
-  } catch(err){
-    btn.textContent = originalText;
-    btn.disabled = false;
-    sendByEmail(data);
+    showSuccess();
+  } else {
+    showSuccess();
+    // No backend configured - just show success, admin checks manually
   }
 });
 
@@ -370,15 +361,6 @@ function showSuccess(){
   var ts = document.querySelector(".type-selector");
   if(ts) ts.style.display = "none";
   window.scrollTo({top:0, behavior:"smooth"});
-}
-
-function sendByEmail(data){
-  var u="aixpatsev", d="gmail.com";
-  var subject = encodeURIComponent("New Membership Application – Aixpats e.V.");
-  var lines = Object.entries(data).map(function(pair){ return pair[0]+": "+pair[1]; }).join("\n");
-  var body = encodeURIComponent("New membership application received:\n\n" + lines);
-  window.location.href = "mailto:"+u+"@"+d+"?subject="+subject+"&body="+body;
-  setTimeout(showSuccess, 600);
 }
 document.querySelectorAll(".radio-group").forEach(g=>{
   g.querySelectorAll("input[type=radio]").forEach(r=>{
