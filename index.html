@@ -393,30 +393,24 @@ function sendContactMsg(){
   var name = document.getElementById('cf-name').value.trim();
   var email = document.getElementById('cf-email').value.trim();
   var msg = document.getElementById('cf-msg').value.trim();
-  var errEl = document.getElementById('cf-error');
+
   if(!name || !email || !msg){
-    errEl.style.display = 'block';
+    document.getElementById('cf-error').style.display = 'block';
     return;
   }
-  errEl.style.display = 'none';
-  var btn = document.getElementById('cf-submit');
-  btn.disabled = true;
-  btn.innerHTML = '⏳ Sending...';
+  document.getElementById('cf-error').style.display = 'none';
 
+  // Show success immediately — no waiting
+  document.getElementById('cf-success').style.display = 'block';
+  document.getElementById('cf-submit').style.display = 'none';
+
+  // Send silently in background via image trick (works everywhere, no CORS)
   var appsUrl = 'https://script.google.com/macros/s/AKfycbwHQWF6K8n3GBZlyhYXL46SS2U4v16Lm3WAbLpBxlS_HimFnuKhQVQkfQENAWV2kkcT/exec';
   var params = 'contact_name=' + encodeURIComponent(name) +
                '&contact_email=' + encodeURIComponent(email) +
                '&contact_msg=' + encodeURIComponent(msg) +
                '&form_type=contact';
-  // Fire and forget — no-cors means we can't read response anyway
-  try { fetch(appsUrl + '?' + params, {method:'GET', mode:'no-cors'}); } catch(err){}
-
-  // Always show success after 1.5s regardless of fetch result
-  setTimeout(function(){
-    document.getElementById('cf-success').style.display = 'block';
-    document.getElementById('contact-form-wrap').style.opacity = '0.4';
-    document.getElementById('contact-form-wrap').style.pointerEvents = 'none';
-  }, 1500);
+  new Image().src = appsUrl + '?' + params;
 }
 
 </script>
