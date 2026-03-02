@@ -118,7 +118,7 @@
     <br/><a href="index.html" style="color:var(--green);font-weight:700;" id="success-back">← Back to Website</a>
   </div>
 
-  <form id="memberForm" action="https://formspree.io/f/xqedojej" method="POST">
+  <form id="memberForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" data-appsscript="https://script.google.com/macros/s/AKfycbwHQWF6K8n3GBZlyhYXL46SS2U4v16Lm3WAbLpBxlS_HimFnuKhQVQkfQENAWV2kkcT/exec">
     <input type="hidden" name="_subject" value="New Membership Application – Aixpats e.V."/>
     <input type="hidden" name="_replyto" id="hidden-email"/>
     <input type="hidden" name="membership_type" id="hidden-type" value="Active"/>
@@ -320,32 +320,66 @@ function formatIBAN(inp){
   inp.value=(v.match(/.{1,4}/g)||[v]).join(" ");
 }
 
-document.getElementById("memberForm").addEventListener("submit",async function(e){
+document.getElementById("memberForm").addEventListener("submit", async function(e){
   e.preventDefault();
-  const btn=document.getElementById("submit-btn");
-  if(this.action.includes("xqedojej")){
-    alert("Setup needed: Please follow the README instructions to connect Formspree for email delivery.");
-    return;
+  const btn = document.getElementById("submit-btn");
+  const originalText = btn.textContent;
+
+  const fd = new FormData(this);
+  const data = {};
+  for(let [k,v] of fd.entries()){
+    data[k] = data[k] ? data[k] + ", " + v : v;
   }
-  btn.textContent="⏳ Sending..."; btn.disabled=true;
-  try{
-    const res=await fetch(this.action,{method:"POST",body:new FormData(this),headers:{Accept:"application/json"}});
-    if(res.ok){
-      document.getElementById("successMsg").style.display="block";
-      this.style.display="none";
-      document.querySelector(".type-selector").style.display="none";
-      window.scrollTo({top:0,behavior:"smooth"});
+
+  const appsScriptUrl = this.dataset.appsscript || "";
+  const formspreeAction = this.action;
+  const hasAppsScript = appsScriptUrl && !appsScriptUrl.includes("https://script.google.com/macros/s/AKfycbwHQWF6K8n3GBZlyhYXL46SS2U4v16Lm3WAbLpBxlS_HimFnuKhQVQkfQENAWV2kkcT/exec");
+  const hasFormspree = !formspreeAction.includes("YOUR_FORMSPREE_ID");
+
+  btn.textContent = "⏳ Sending...";
+  btn.disabled = true;
+
+  try {
+    if(hasAppsScript){
+      const res = await fetch(appsScriptUrl, {
+        method:"POST",
+        body: JSON.stringify(data),
+        headers:{"Content-Type":"application/json"}
+      });
+      const json = await res.json();
+      if(json.result === "success"){ showSuccess(); }
+      else { throw new Error("Apps Script error"); }
+    } else if(hasFormspree){
+      const res = await fetch(formspreeAction, {
+        method:"POST", body:fd, headers:{Accept:"application/json"}
+      });
+      if(res.ok){ showSuccess(); } else { throw new Error("Formspree error"); }
     } else {
-      alert("Something went wrong. Please email aixpatsev@gmail.com directly.");
-      btn.textContent=document.documentElement.lang==="de"?"Antrag einreichen →":"Submit Application →";
-      btn.disabled=false;
+      sendByEmail(data);
     }
-  } catch{
-    alert("Network error. Please email aixpatsev@gmail.com directly.");
-    btn.textContent="Submit Application →"; btn.disabled=false;
+  } catch(err){
+    btn.textContent = originalText;
+    btn.disabled = false;
+    sendByEmail(data);
   }
 });
 
+function showSuccess(){
+  document.getElementById("successMsg").style.display = "block";
+  document.getElementById("memberForm").style.display = "none";
+  var ts = document.querySelector(".type-selector");
+  if(ts) ts.style.display = "none";
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function sendByEmail(data){
+  var u="aixpatsev", d="gmail.com";
+  var subject = encodeURIComponent("New Membership Application – Aixpats e.V.");
+  var lines = Object.entries(data).map(function(pair){ return pair[0]+": "+pair[1]; }).join("\n");
+  var body = encodeURIComponent("New membership application received:\n\n" + lines);
+  window.location.href = "mailto:"+u+"@"+d+"?subject="+subject+"&body="+body;
+  setTimeout(showSuccess, 600);
+}
 document.querySelectorAll(".radio-group").forEach(g=>{
   g.querySelectorAll("input[type=radio]").forEach(r=>{
     r.addEventListener("change",e=>{
@@ -421,6 +455,15 @@ if(params.get("type")==="nonactive") selectType("nonactive");
 else selectType("active");
 if(params.get("lang")==="de") setLang("de");
 else setLang("en");
+</script>
+<script>
+(function(){
+  var u='aixpatsev',d='gmail.com',em=u+'@'+d;
+  document.querySelectorAll('.em-reveal').forEach(function(el){el.textContent=em;});
+  document.querySelectorAll('a[href="#"]').forEach(function(a){
+    if(a.onclick && a.onclick.toString().indexOf('mailto')>-1) return;
+  });
+})();
 </script>
 </body>
 </html>
