@@ -118,7 +118,7 @@
     <br/><a href="index.html" style="color:var(--green);font-weight:700;" id="success-back">← Back to Website</a>
   </div>
 
-  <form id="memberForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" data-appsscript="YOUR_APPS_SCRIPT_URL">
+  <form id="memberForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" data-appsscript="https://docs.google.com/spreadsheets/d/1lxu6ylMV6_REYTBhca2aoFFNOstJ-adIg6YcGSnooUU/edit?usp=sharing">
     <input type="hidden" name="_subject" value="New Membership Application – Aixpats e.V."/>
     <input type="hidden" name="_replyto" id="hidden-email"/>
     <input type="hidden" name="membership_type" id="hidden-type" value="Active"/>
@@ -333,7 +333,7 @@ document.getElementById("memberForm").addEventListener("submit", async function(
   }
 
   const appsScriptUrl = this.dataset.appsscript || "";
-  const hasAppsScript = appsScriptUrl && !appsScriptUrl.includes("YOUR_APPS_SCRIPT_URL");
+  const hasAppsScript = appsScriptUrl && !appsScriptUrl.includes("https://docs.google.com/spreadsheets/d/1lxu6ylMV6_REYTBhca2aoFFNOstJ-adIg6YcGSnooUU/edit?usp=sharing");
 
   btn.textContent = "⏳ Sending...";
   btn.disabled = true;
