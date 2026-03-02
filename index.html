@@ -408,13 +408,15 @@ function sendContactMsg(){
                '&contact_email=' + encodeURIComponent(email) +
                '&contact_msg=' + encodeURIComponent(msg) +
                '&form_type=contact';
-  fetch(appsUrl + '?' + params, {method:'GET', mode:'no-cors'})
-    .catch(function(){})
-    .finally(function(){
-      document.getElementById('cf-success').style.display = 'block';
-      document.getElementById('contact-form-wrap').style.opacity = '0.4';
-      document.getElementById('contact-form-wrap').style.pointerEvents = 'none';
-    });
+  // Fire and forget — no-cors means we can't read response anyway
+  try { fetch(appsUrl + '?' + params, {method:'GET', mode:'no-cors'}); } catch(err){}
+
+  // Always show success after 1.5s regardless of fetch result
+  setTimeout(function(){
+    document.getElementById('cf-success').style.display = 'block';
+    document.getElementById('contact-form-wrap').style.opacity = '0.4';
+    document.getElementById('contact-form-wrap').style.pointerEvents = 'none';
+  }, 1500);
 }
 
 </script>
